@@ -1,8 +1,9 @@
 import express from "express";
 import { Welcome } from "./helpers/welcome.js";
+import "dotenv/config";
 
 const app = express();
-const port = 8000;
+const port = process.env.PORT;
 
 app.get("/", Welcome);
 
