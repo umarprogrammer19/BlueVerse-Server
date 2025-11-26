@@ -112,3 +112,19 @@ export const updateCustomer = async (req, res) => {
         });
     }
 }
+
+export const getAllCustomers = async (req, res) => {
+    try {
+        const users = await User.find({});
+        res.status(200).json({
+            success: true,
+            users
+        });
+    } catch (error) {
+        console.error("Error getting all customers:", error.message);
+        res.status(500).json({
+            success: false,
+            message: error.message || "Internal server error",
+        });
+    }
+}
