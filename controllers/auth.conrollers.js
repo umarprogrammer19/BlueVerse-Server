@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import User from "../models/user.models.js";
+import { User } from "../models/user.models.js";
 import { generateAccessToken } from '../utils/jwt.js';
 
 // Signup Api
