@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import { User } from "../models/user.models.js";
 import { generateAccessToken } from '../utils/jwt.js';
+import bcrypt from "bcrypt";
 
 // Signup Api
 export const signup = async (req, res) => {
@@ -17,8 +18,8 @@ export const signup = async (req, res) => {
             success: false,
             message: "User already exists"
         });
-
-        await User.create({ firstName, lastName, email, password });
+        const hashPassword = await bcrypt.hash(password, 10);
+        await User.create({ firstName, lastName, email, password: hashPassword });
 
         res.status(201).json({
             success: true,
