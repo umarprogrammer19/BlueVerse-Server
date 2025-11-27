@@ -69,7 +69,7 @@ export const createInvoice = async (req, res) => {
                         background-color: #f9f9f9;
                     }
                     .invoice-box {
-                        max-width: 850px;
+                        max-width: 800px;
                         margin: 30px auto;
                         padding: 40px;
                         border: 1px solid #ddd;
@@ -207,7 +207,7 @@ export const createInvoice = async (req, res) => {
   </defs>
 </svg>
                         </div>
-                        <p style="font-size: 12px; margin-top: 5px; color: #777;">TRN: 100200300400500</p>
+                        <p style="font-size: 16px; margin-top: 5px; color: #777;">TRN: 100200300400500</p>
                         <p>Blueverse Vehicle Washing LLC Metropolis Towers #403 Business Bay, Dubai, UAE</p>
                         <p>+971 544692205</p>
                     </div>
