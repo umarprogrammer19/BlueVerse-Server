@@ -6,18 +6,18 @@ const invoiceSchema = new mongoose.Schema({
             ref: "Customer",
             required: true,
         },
-        serviceDetails: {
-            id: String,
+        serviceDetails: new mongoose.Schema({
+            id: { type: String },
             serviceName: {
                 type: String,
                 required: true
             },
-            type: String,
+            type: { type: String },
             price: {
                 type: Number,
                 required: true
-            },
-        },
+            }
+        }),
         state: {
             type: String,
             default: "Al Quoz"
@@ -46,7 +46,7 @@ const invoiceSchema = new mongoose.Schema({
 
     
 // Tax & total Calculating From Backend
-invoiceSchema.pre("validate", function (next) {
+invoiceSchema.pre("validate", function () {
     const price = this.serviceDetails?.price || 0;
     const discount = this.discounts || 0;
 
@@ -58,7 +58,6 @@ invoiceSchema.pre("validate", function (next) {
     this.taxAmount = taxAmount;
     this.total = total;
 
-    next();
 });
 
 export default mongoose.model("Invoice", invoiceSchema);
