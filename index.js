@@ -4,7 +4,8 @@ import { Welcome } from "./helpers/welcome.js";
 import { connectDB } from "./database/connection.js";
 import authRoutes from "./routes/auth.routes.js";
 import cookieParser from "cookie-parser";
-import invoiceRoutes from "./routes/invoice.routes.js"
+import invoiceRoutes from "./routes/invoice.routes.js";
+import customerRoutes from "./routes/customer.routes.js";
 
 const app = express();
 app.use(express.json());
@@ -13,6 +14,7 @@ app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/invoices", invoiceRoutes);
+app.use("/api/customers", customerRoutes);
 
 const port = process.env.PORT;
 
