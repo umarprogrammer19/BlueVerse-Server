@@ -4,6 +4,7 @@ import { Welcome } from "./helpers/welcome.js";
 import { connectDB } from "./database/connection.js";
 import authRoutes from "./routes/auth.routes.js";
 import cookieParser from "cookie-parser";
+import invoiceRoutes from "./routes/invoice.routes.js"
 
 const app = express();
 app.use(express.json());
