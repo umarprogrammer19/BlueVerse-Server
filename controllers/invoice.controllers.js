@@ -143,14 +143,16 @@ export const createInvoice = async (req, res) => {
             <body>
                 <div class="invoice-box">
                     <div class="header">
-                        <h1>PAID</h1>
+                        <div class="logo">
+                            <img src="https://wheat-ferret-827560.hostingersite.com/wp-content/uploads/2025/10/image-5-1.png" alt="Company Logo" style="width: 190px; height: 49px;"/>
+                        </div>
                         <p>Al Quoz</p>
                         <p>(555) 555-5555</p>
                     </div>
 
                     <div class="barcode">
                         <!-- Barcode will be inserted here -->
-                                                <img src="${barcodeDataUri}" alt="barcode" width="150" height="60"/>
+                        <img src="${barcodeDataUri}" alt="barcode" width="150" height="60"/>
                     </div>
 
                     <table class="details-table">
