@@ -1,11 +1,11 @@
-import bwipjs from 'bwip-js';
-import nodemailer from "nodemailer";
-import path from "path";
-import { fileURLToPath } from 'url';
-import Customer from "../models/customer.model.js";
 import Invoice from "../models/invoice.models.js";
-import puppeteer from 'puppeteer-core';
-import chromeLambda from 'chrome-aws-lambda';
+import Customer from "../models/customer.model.js";
+import nodemailer from "nodemailer";
+import pdf from "html-pdf";
+import fs from "fs";
+import path from "path";
+import bwipjs from 'bwip-js';
+import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -289,68 +289,51 @@ export const createInvoice = async (req, res) => {
             </html>
         `;
 
-        const getPuppeteerExecutablePath = async () => {
-            if (process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.VERCEL) {
-                // Use the chrome-aws-lambda executable path in serverless environments
-                return await chromeLambda.executablePath;
-            } else {
-                // Use the local version of Chrome for development environments
-                const browserFetcher = puppeteer.createBrowserFetcher();
-                const revisionInfo = await browserFetcher.download('1005010'); // Compatible revision of Chrome
-                return revisionInfo.executablePath;
+        const pdfPath = path.join(__dirname, `invoice-${newInvoice._id}.pdf`);
+        pdf.create(invoiceHtml, {}).toFile(pdfPath, async (err) => {
+            if (err) {
+                console.error("Error generating PDF:", err);
+                return res.status(500).json({ message: "Error generating invoice PDF." });
             }
-        };
 
-        const generatePdfWithPuppeteer = async (htmlContent) => {
-            const browser = await puppeteer.launch({
-                args: chromeLambda.args, // Include the necessary args for headless Chrome
-                executablePath: await getPuppeteerExecutablePath(),
-                headless: chromeLambda.headless,
+            // Send email
+            let transporter = nodemailer.createTransport({
+                host: process.env.SMTP_HOST,
+                port: process.env.SMTP_PORT,
+                secure: process.env.SMTP_SECURE === "true",
+                auth: {
+                    user: process.env.SMTP_USER,
+                    pass: process.env.SMTP_PASS,
+                },
             });
 
-            const page = await browser.newPage();
-            await page.setContent(htmlContent);
-            const pdfBuffer = await page.pdf({ format: 'A4' });
+            const mailOptions = {
+                from: process.env.SMTP_USER,
+                to: [existingCustomer.email, process.env.SMTP_USER],
+                subject: `Invoice from BlueVerse - #${newInvoice._id}`,
+                html: "Please find your invoice attached.",
+                attachments: [
+                    {
+                        filename: `invoice-${newInvoice._id}.pdf`,
+                        path: pdfPath,
+                        contentType: "application/pdf",
+                    },
+                ],
+            };
 
-            await browser.close();
-            return pdfBuffer;
-        };
-
-        const pdfBuffer = await generatePdfWithPuppeteer(invoiceHtml);
-
-        // Instead of saving the PDF to a file, directly attach the buffer to the email
-        let transporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST,
-            port: process.env.SMTP_PORT,
-            secure: process.env.SMTP_SECURE === "true",
-            auth: {
-                user: process.env.SMTP_USER,
-                pass: process.env.SMTP_PASS,
-            },
-        });
-
-        const mailOptions = {
-            from: process.env.SMTP_USER,
-            to: [existingCustomer.email, process.env.SMTP_USER],
-            subject: `Invoice from BlueVerse - #${newInvoice._id}`,
-            html: "Please find your invoice attached.",
-            attachments: [
-                {
-                    filename: `invoice-${newInvoice._id}.pdf`,
-                    content: pdfBuffer,
-                    contentType: "application/pdf",
-                },
-            ],
-        };
-
-        transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                console.error("Error sending email:", error);
-                return res.status(500).json({ message: "Error sending invoice email." });
-            } else {
-                console.log("Email sent:", info.response);
-                res.status(201).json({ message: "Invoice created and sent successfully!", invoice: newInvoice });
-            }
+            transporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    console.error("Error sending email:", error);
+                    return res.status(500).json({ message: "Error sending invoice email." });
+                } else {
+                    console.log("Email sent:", info.response);
+                    // Delete the generated PDF after sending
+                    fs.unlink(pdfPath, (unlinkErr) => {
+                        if (unlinkErr) console.error("Error deleting PDF:", unlinkErr);
+                    });
+                    res.status(201).json({ message: "Invoice created and sent successfully!", invoice: newInvoice });
+                }
+            });
         });
     } catch (error) {
         console.error("Error creating invoice:", error);
