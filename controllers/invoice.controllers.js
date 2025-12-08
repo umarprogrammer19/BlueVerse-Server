@@ -4,7 +4,7 @@ import path from "path";
 import { fileURLToPath } from 'url';
 import Customer from "../models/customer.model.js";
 import Invoice from "../models/invoice.models.js";
-import puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer-core';
 import chromeLambda from 'chrome-aws-lambda';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -289,9 +289,23 @@ export const createInvoice = async (req, res) => {
             </html>
         `;
 
+        const getPuppeteerExecutablePath = async () => {
+            if (process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.VERCEL) {
+                // Use the chrome-aws-lambda executable path in serverless environments
+                return await chromeLambda.executablePath;
+            } else {
+                // Use the local version of Chrome for development environments
+                const browserFetcher = puppeteer.createBrowserFetcher();
+                const revisionInfo = await browserFetcher.download('1005010'); // Compatible revision of Chrome
+                return revisionInfo.executablePath;
+            }
+        };
+
         const generatePdfWithPuppeteer = async (htmlContent) => {
             const browser = await puppeteer.launch({
-                headless: true,
+                args: chromeLambda.args, // Include the necessary args for headless Chrome
+                executablePath: await getPuppeteerExecutablePath(),
+                headless: chromeLambda.headless,
             });
 
             const page = await browser.newPage();
