@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(node -e:*)"
+      "Bash(node -e:*)",
+      "Bash(npm install)",
+      "Bash(npm install --legacy-peer-deps)"
     ],
     "deny": [],
     "ask": []
