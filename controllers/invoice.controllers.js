@@ -6,6 +6,12 @@ import fs from "fs";
 import path from "path";
 import bwipjs from 'bwip-js';
 import { fileURLToPath } from 'url';
+import phantomjs from "phantomjs-prebuilt";
+
+const options = {
+    format: 'A4',
+    phantomPath: phantomjs.path
+};
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -290,7 +296,7 @@ export const createInvoice = async (req, res) => {
         `;
 
         const pdfPath = path.join(__dirname, `invoice-${newInvoice._id}.pdf`);
-        pdf.create(invoiceHtml, {}).toFile(pdfPath, async (err) => {
+        pdf.create(invoiceHtml, options).toFile(pdfPath, async (err) => {
             if (err) {
                 console.error("Error generating PDF:", err);
                 return res.status(500).json({ message: "Error generating invoice PDF." });
