@@ -19,7 +19,7 @@ export const createInvoice = async (req, res) => {
             return res.status(400).json({ message: "Missing required invoice fields." });
         }
 
-        // Check if customer exists (assuming Customer model)
+        // Check if customer exists
         const existingCustomer = await Customer.findById(customer);
         if (!existingCustomer) {
             return res.status(404).json({ message: "Customer not found." });
