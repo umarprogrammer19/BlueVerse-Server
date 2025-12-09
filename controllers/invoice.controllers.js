@@ -302,7 +302,6 @@ export const createInvoice = async (req, res) => {
                 return res.status(500).json({ message: "Error generating invoice PDF." });
             }
 
-            // Send email
             let transporter = nodemailer.createTransport({
                 host: process.env.SMTP_HOST,
                 port: process.env.SMTP_PORT,
@@ -333,7 +332,6 @@ export const createInvoice = async (req, res) => {
                     return res.status(500).json({ message: "Error sending invoice email." });
                 } else {
                     console.log("Email sent:", info.response);
-                    // Delete the generated PDF after sending
                     fs.unlink(pdfPath, (unlinkErr) => {
                         if (unlinkErr) console.error("Error deleting PDF:", unlinkErr);
                     });
