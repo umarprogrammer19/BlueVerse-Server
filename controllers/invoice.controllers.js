@@ -6,7 +6,6 @@ import sharp from "sharp";
 import { fileURLToPath } from 'url';
 import Customer from "../models/customer.model.js";
 import Invoice from "../models/invoice.models.js";
-import bwipjs from 'bwip-js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
