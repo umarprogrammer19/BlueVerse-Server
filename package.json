@@ -22,7 +22,7 @@
   "dependencies": {
     "bcrypt": "^6.0.0",
     "bwip-js": "^4.8.0",
-    "chrome-aws-lambda": "^10.1.0",
+    "chrome-aws-lambda": "^1.20.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
@@ -32,7 +32,8 @@
     "nodemailer": "^7.0.11",
     "pdfkit": "^0.17.2",
     "puppeteer": "^24.32.1",
-    "puppeteer-core": "^24.32.1"
+    "puppeteer-core": "^24.32.1",
+    "sharp": "^0.34.5"
   },
   "devDependencies": {
     "nodemon": "^3.1.11"
