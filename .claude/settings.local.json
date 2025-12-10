@@ -3,7 +3,8 @@
     "allow": [
       "Bash(node -e:*)",
       "Bash(npm install)",
-      "Bash(npm install --legacy-peer-deps)"
+      "Bash(npm install --legacy-peer-deps)",
+      "Bash(npm run dev)"
     ],
     "deny": [],
     "ask": []
