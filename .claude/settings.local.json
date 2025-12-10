@@ -4,7 +4,9 @@
       "Bash(node -e:*)",
       "Bash(npm install)",
       "Bash(npm install --legacy-peer-deps)",
-      "Bash(npm run dev)"
+      "Bash(npm run dev)",
+      "Bash(npm install cloudinary)",
+      "Bash(npm install cloudinary --legacy-peer-deps)"
     ],
     "deny": [],
     "ask": []

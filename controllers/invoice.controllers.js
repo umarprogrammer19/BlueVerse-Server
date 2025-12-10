@@ -1,12 +1,12 @@
-import Invoice from "../models/invoice.models.js";
-import Customer from "../models/customer.model.js";
-import nodemailer from "nodemailer";
-import PDFDocument from "pdfkit";
 import fs from "fs";
+import nodemailer from "nodemailer";
 import path from "path";
-import bwipjs from 'bwip-js';
-import { fileURLToPath } from 'url';
+import PDFDocument from "pdfkit";
 import sharp from "sharp";
+import { fileURLToPath } from 'url';
+import Customer from "../models/customer.model.js";
+import Invoice from "../models/invoice.models.js";
+import bwipjs from 'bwip-js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -201,9 +201,16 @@ export const createInvoice = async (req, res) => {
             // End the document
             doc.end();
 
-            // Wait for the PDF to finish writing, then send email
+            // Wait for the PDF to finish writing, then read the PDF data and send to frontend
             stream.on('finish', async () => {
                 try {
+                    // Read the PDF file data
+                    const pdfBuffer = fs.readFileSync(pdfPath);
+
+                    // Convert PDF buffer to base64 string for sending to frontend
+                    const pdfBase64 = pdfBuffer.toString('base64');
+
+                    // Send email with invoice PDF as attachment
                     let transporter = nodemailer.createTransport({
                         host: process.env.SMTP_HOST,
                         port: process.env.SMTP_PORT,
@@ -230,25 +237,36 @@ export const createInvoice = async (req, res) => {
 
                     // Send email with invoice PDF
                     transporter.sendMail(mailOptions, (error, info) => {
+                        // Delete the temporary PDF file after email attempt
+                        fs.unlink(pdfPath, (unlinkErr) => {
+                            if (unlinkErr) console.error("Error deleting PDF:", unlinkErr);
+                        });
+
                         if (error) {
                             console.error("Error sending email:", error);
-                            // Still try to delete the PDF file even if email fails
-                            fs.unlink(pdfPath, (unlinkErr) => {
-                                if (unlinkErr) console.error("Error deleting PDF:", unlinkErr);
+                            // Still return the PDF data to the frontend even if email fails
+                            return res.status(201).json({
+                                message: "Invoice created but email sending failed!",
+                                invoice: newInvoice,
+                                pdfData: pdfBase64
                             });
-                            return res.status(500).json({ message: "Error sending invoice email." });
                         } else {
                             console.log("Email sent:", info.response);
-                            // Delete the temporary PDF file after sending email
-                            fs.unlink(pdfPath, (unlinkErr) => {
-                                if (unlinkErr) console.error("Error deleting PDF:", unlinkErr);
+                            // Return the PDF data to the frontend
+                            res.status(201).json({
+                                message: "Invoice created and sent successfully!",
+                                invoice: newInvoice,
+                                pdfData: pdfBase64
                             });
-                            res.status(201).json({ message: "Invoice created and sent successfully!", invoice: newInvoice, pdfPath });
                         }
                     });
-                } catch (emailError) {
-                    console.error("Error setting up email transport:", emailError);
-                    return res.status(500).json({ message: "Error setting up email transport." });
+                } catch (readError) {
+                    console.error("Error reading PDF file:", readError);
+                    // Delete the temporary PDF file even if reading fails
+                    fs.unlink(pdfPath, (unlinkErr) => {
+                        if (unlinkErr) console.error("Error deleting PDF:", unlinkErr);
+                    });
+                    return res.status(500).json({ message: "Error reading invoice PDF." });
                 }
             });
 
