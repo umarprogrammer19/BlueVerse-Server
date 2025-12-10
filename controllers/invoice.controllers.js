@@ -243,7 +243,7 @@ export const createInvoice = async (req, res) => {
                             fs.unlink(pdfPath, (unlinkErr) => {
                                 if (unlinkErr) console.error("Error deleting PDF:", unlinkErr);
                             });
-                            res.status(201).json({ message: "Invoice created and sent successfully!", invoice: newInvoice });
+                            res.status(201).json({ message: "Invoice created and sent successfully!", invoice: newInvoice, pdfPath });
                         }
                     });
                 } catch (emailError) {
