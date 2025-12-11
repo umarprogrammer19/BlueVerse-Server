@@ -106,37 +106,35 @@ export const createInvoice = async (req, res) => {
             const totalBgColor = '#f0f0f0';
 
             // Add header with company logo area and styling
-            doc.image(svgToPngBuffer, 50, 50, { width: 230, height: 57 });
+            doc.moveDown();
+            doc.image(svgToPngBuffer, 60, 55, { width: 200, height: 47 });
             doc.fillColor('black');
             doc.fillColor('black').fontSize(14).moveDown(0.5);
 
             // Company information in header area
-            doc.fontSize(14).fillColor(primaryColor).text('Blueverse Vehicle Washing LLC', 50, 120);
+            doc.fontSize(14).fillColor(primaryColor).text('Blueverse Vehicle Washing LLC', 60, 120);
             doc.fillColor('black').fontSize(12);
-            doc.fontSize(12).text('Metropolis Towers', 50, 140);
-            doc.fontSize(12).text('#403 Business Bay, Dubai, UAE', 50, 160);
-            doc.text('+971 544692205', 50, 180);
-            doc.text('TRN: 104621245000003', 50, 200);
+            doc.fontSize(12).text('Metropolis Towers', 60, 140);
+            doc.fontSize(12).text('#403 Business Bay, Dubai, UAE', 60, 160);
+            doc.text('+971 544692205', 60, 180);
+            doc.text('TRN: 104621245000003', 60, 200);
 
             // Right-aligned invoice details
-            doc.fillColor('black').fontSize(14);
-            doc.text(`Invoice #: BV-${newInvoice.transactionId}`, 300, 100, { align: 'right' });
-            doc.text(`Transaction #: ${newInvoice.transactionId}`, 300, 120, { align: 'right' });
-            doc.text(`Date: ${new Date().toLocaleDateString('en-US')}`, 300, 140, { align: 'right' });
-            doc.text(`Time: ${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`, 300, 160, { align: 'right' });
+            doc.fillColor('black').fontSize(12);
+            doc.text(`Invoice #: BV-${newInvoice.transactionId}`, 400, 120,);
+            doc.text(`Transaction #: ${newInvoice.transactionId}`, 400, 140,);
+            doc.text(`Date: ${new Date().toLocaleDateString('en-US')}`, 400, 160,);
+            doc.text(`Time: ${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`, 400, 180,);
 
             // Add a horizontal line separator
             doc.moveTo(50, 190).lineTo(550, 190).stroke('#eee');
 
             // Add customer info
             doc.fillColor('black').fontSize(12).moveDown(2);
-            doc.text(`User: ${existingCustomer.firstName + " " + existingCustomer.lastName}`, 50, 220);
-
-            // Add license info placeholder
-            doc.text('License: 000025', 50, 240);
+            doc.text(`User: ${existingCustomer.firstName + " " + existingCustomer.lastName}`, 60, 220);
 
             // Transaction ID as barcode placeholder
-            doc.text(`Transaction ID: ${newInvoice.transactionId}`, 400, 210, { align: 'right' });
+            doc.text(`Transaction ID: ${newInvoice.transactionId}`, 400, 210,);
 
             // Add table headers with background
             let yPosition = 270;
@@ -144,37 +142,37 @@ export const createInvoice = async (req, res) => {
             // Invoice items table header
             doc.rect(50, yPosition, 500, 30).fill(headerBgColor);
             doc.fillColor('black').fontSize(12).text('Description', 60, yPosition + 8);
-            doc.text('Amount', 480, yPosition + 8, { align: 'right' });
+            doc.text('Amount', 500, yPosition + 8,);
 
             yPosition += 35;
 
             // Add service details row
             doc.fillColor('black').fontSize(12);
             doc.text(newInvoice.serviceDetails.serviceName, 60, yPosition);
-            doc.text(newInvoice.serviceDetails.price.toFixed(2), 480, yPosition, { align: 'right' });
+            doc.text(newInvoice.serviceDetails.price.toFixed(2), 500, yPosition,);
             yPosition += 25;
 
             // Add discounts row
             doc.text('Discounts', 60, yPosition);
-            doc.text(`-${newInvoice.discounts.toFixed(2)}`, 480, yPosition, { align: 'right' });
+            doc.text(`-${newInvoice.discounts.toFixed(2)}`, 500, yPosition,);
             yPosition += 25;
 
             // Add subtotal row
             doc.text('Subtotal', 60, yPosition);
-            doc.text(newInvoice.subtotal.toFixed(2), 480, yPosition, { align: 'right' });
+            doc.text(newInvoice.subtotal.toFixed(2), 500, yPosition,);
             yPosition += 25;
 
             // Add tax row
             doc.text(`Tax Rate (${(newInvoice.taxRate * 100).toFixed(0)}%)`, 60, yPosition);
-            doc.text(newInvoice.taxAmount.toFixed(2), 480, yPosition, { align: 'right' });
+            doc.text(newInvoice.taxAmount.toFixed(2), 500, yPosition,);
             yPosition += 35;
 
             // Add total line with background
             doc.rect(50, yPosition, 500, 35).fill(totalBgColor);
             doc.fillColor(primaryColor).fontSize(14).text('Total', 60, yPosition + 10);
             // Add currency symbol
-            // doc.fontSize(16).text('AED', 400, yPosition + 8, { align: 'right' });
-            doc.fontSize(14).text(`AED ${newInvoice.total.toFixed(2)}`, 480, yPosition + 10, { align: 'right' });
+            // doc.fontSize(16).text('AED', 400, yPosition + 8, );
+            doc.fontSize(14).text(`AED ${newInvoice.total.toFixed(2)}`, 470, yPosition + 10,);
 
             yPosition += 60;
 
